@@ -1,0 +1,7 @@
+<component name="CopyrightManager">
+  <settings default="epam_open_sorce">
+    <module2copyright>
+      <element module="Project Source Files" copyright="epam_open_sorce" />
+    </module2copyright>
+  </settings>
+</component>

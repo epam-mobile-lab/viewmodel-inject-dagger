@@ -1,0 +1,12 @@
+detekt {
+    config = files("detekt-config.yml")
+    reports {
+        html {
+            enabled = true
+            destination = new File(project.buildDir, "reports/detekt/report.html")
+        }
+        xml {
+            enabled = false
+        }
+    }
+}

@@ -1,0 +1,21 @@
+apply plugin: 'java-library'
+apply plugin: 'maven-publish'
+
+def group = 'com.epam.inject.viewmodel'
+def artifact = 'stub'
+def ver = '0.1.0'
+
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId = group
+            artifactId = artifact
+            version = ver
+
+            from components.java
+        }
+    }
+}

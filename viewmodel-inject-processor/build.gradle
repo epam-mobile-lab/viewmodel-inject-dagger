@@ -1,0 +1,36 @@
+import org.gradle.internal.jvm.Jvm
+
+ext {
+    group = 'com.epam.inject.viewmodel'
+    artifact = 'processor'
+    ver = '0.1.0'
+}
+
+apply plugin: 'java-library'
+apply plugin: 'kotlin'
+apply plugin: 'io.gitlab.arturbosch.detekt'
+apply from: "ktlint.gradle"
+apply from: "detekt.gradle"
+apply from: "publish.gradle"
+
+compileKotlin {
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_1_8
+    }
+}
+
+dependencies {
+    implementation project(':viewmodel-inject-annotations')
+    implementation project(':viewmodel-androidx-stub')
+
+    implementation "com.squareup:javapoet:$javapoet_ver"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_ver"
+    compileOnly "com.google.dagger:dagger:$dagger_ver"
+
+
+    ktlint "com.pinterest:ktlint:$ktlint_ver"
+
+
+    testImplementation "com.google.testing.compile:compile-testing:$compile_testing_ver"
+    testImplementation files(Jvm.current().getToolsJar())
+}

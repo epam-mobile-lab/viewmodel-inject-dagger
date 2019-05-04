@@ -1,0 +1,26 @@
+apply plugin: 'java-library'
+apply plugin: 'maven-publish'
+
+def group = 'com.epam.inject.viewmodel'
+def artifact = 'annotation'
+def ver = '0.1.0'
+
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
+
+dependencies {
+    compileOnly "com.google.dagger:dagger:$dagger_ver"
+    compileOnly project(':viewmodel-androidx-stub')
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId = group
+            artifactId = artifact
+            version = ver
+
+            from components.java
+        }
+    }
+}

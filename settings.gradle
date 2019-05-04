@@ -1,0 +1,1 @@
+include ':app', ':viewmodel-inject-annotations', ':viewmodel-inject-processor', ':viewmodel-androidx-stub'

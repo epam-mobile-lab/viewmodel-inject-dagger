@@ -1,0 +1,44 @@
+apply plugin: 'com.android.application'
+
+android {
+
+    compileSdkVersion 28
+
+    defaultConfig {
+        applicationId "com.epam.viewmodelinjectionref"
+        minSdkVersion 24
+        targetSdkVersion 28
+        versionCode 1
+        versionName "1.0"
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = ['generatedViewModelFactory': 'com.epam.viewmodelinjectionref.GeneratedViewModelFactory']
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+
+    //dagger2
+    implementation "com.google.dagger:dagger:$dagger_ver"
+    annotationProcessor "com.google.dagger:dagger-compiler:$dagger_ver"
+
+    //lifecycle
+    implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle_ver"
+
+    //app compat
+    implementation "androidx.appcompat:appcompat:$app_compat_ver"
+
+    //view model inject processor and annotations
+    implementation project(":viewmodel-inject-annotations")
+    annotationProcessor project(":viewmodel-inject-processor")
+
+}
