@@ -24,7 +24,7 @@ dependencies {
     implementation project(':viewmodel-androidx-stub')
 
     implementation "com.squareup:javapoet:$javapoet_ver"
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_ver"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_ver"
     compileOnly "com.google.dagger:dagger:$dagger_ver"
 
 

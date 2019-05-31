@@ -1,4 +1,6 @@
 apply plugin: 'com.android.application'
+apply plugin: "kotlin-android"
+apply plugin: "kotlin-kapt"
 
 android {
 
@@ -6,15 +8,10 @@ android {
 
     defaultConfig {
         applicationId "com.epam.viewmodelinjectionref"
-        minSdkVersion 24
+        minSdkVersion 21
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"
-        javaCompileOptions {
-            annotationProcessorOptions {
-                arguments = ['generatedViewModelFactory': 'com.epam.viewmodelinjectionref.GeneratedViewModelFactory']
-            }
-        }
     }
 
     buildTypes {
@@ -25,20 +22,21 @@ android {
     }
 }
 
-dependencies {
+kapt {
+    arguments {
+        arg("generatedViewModelFactory": "com.epam.viewmodelinjectionref.GeneratedViewModelFactory")
+    }
+}
 
-    //dagger2
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_ver"
+
     implementation "com.google.dagger:dagger:$dagger_ver"
     annotationProcessor "com.google.dagger:dagger-compiler:$dagger_ver"
 
-    //lifecycle
     implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle_ver"
-
-    //app compat
     implementation "androidx.appcompat:appcompat:$app_compat_ver"
 
-    //view model inject processor and annotations
     implementation project(":viewmodel-inject-annotations")
-    annotationProcessor project(":viewmodel-inject-processor")
-
+    kapt project(":viewmodel-inject-processor")
 }

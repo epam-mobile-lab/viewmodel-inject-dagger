@@ -14,17 +14,13 @@
  * limitations under the License.
  */
 
-package com.epam.viewmodelinjectionref.data;
+package com.epam.viewmodelinjectionref
 
-public class Repository {
+import android.app.Application
+import com.epam.viewmodelinjectionref.dagger.ApplicationComponent
 
-    private final String name;
 
-    public Repository(String name) {
-        this.name = name;
-    }
+class MainApplication : Application() {
 
-    public String getName() {
-        return name;
-    }
+    val applicationComponent: ApplicationComponent = error("") //DaggerApplicationComponent.create()
 }

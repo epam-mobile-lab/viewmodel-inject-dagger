@@ -14,23 +14,15 @@
  * limitations under the License.
  */
 
-package com.epam.viewmodelinjectionref.ui.repository;
+package com.epam.viewmodelinjectionref.dagger
 
-import androidx.lifecycle.ViewModel;
+import com.epam.viewmodelinjectionref.SampleFragment
 
-import com.epam.inject.viewmodel.AssistedViewModel;
-import com.epam.viewmodelinjectionref.data.Repository;
+import dagger.Component
+import generated.GeneratedViewModelFactory
 
-public class RepositoryViewModel extends ViewModel {
+@Component(modules = [ModelModule::class, GeneratedViewModelFactory::class])
+interface ApplicationComponent {
 
-    private final Repository repository;
-
-    @AssistedViewModel
-    public RepositoryViewModel(Repository repository) {
-        this.repository = repository;
-    }
-
-    public Repository getRepository() {
-        return repository;
-    }
+    fun inject(fragment: SampleFragment)
 }

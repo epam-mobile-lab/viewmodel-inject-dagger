@@ -14,23 +14,6 @@
  * limitations under the License.
  */
 
-package com.epam.viewmodelinjectionref.ui.database;
+package com.epam.viewmodelinjectionref.data
 
-import androidx.lifecycle.ViewModel;
-
-import com.epam.inject.viewmodel.AssistedViewModel;
-import com.epam.viewmodelinjectionref.data.DatabaseDao;
-
-public class DaoViewModel extends ViewModel {
-
-    private final DatabaseDao databaseDao;
-
-    @AssistedViewModel
-    public DaoViewModel(DatabaseDao databaseDao) {
-        this.databaseDao = databaseDao;
-    }
-
-    public DatabaseDao getDatabaseDao() {
-        return databaseDao;
-    }
-}
+class Repository(val name: String)

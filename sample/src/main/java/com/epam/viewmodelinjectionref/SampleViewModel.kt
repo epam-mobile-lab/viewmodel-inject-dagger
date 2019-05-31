@@ -14,18 +14,11 @@
  * limitations under the License.
  */
 
-package com.epam.viewmodelinjectionref;
+package com.epam.viewmodelinjectionref
 
-import android.app.Application;
+import com.epam.inject.viewmodel.AssistedViewModel
+import com.epam.viewmodelinjectionref.data.Repository
 
-import com.epam.viewmodelinjectionref.di.ApplicationComponent;
-import com.epam.viewmodelinjectionref.di.DaggerApplicationComponent;
+import androidx.lifecycle.ViewModel
 
-public class MainApplication extends Application {
-
-    private final ApplicationComponent applicationComponent = DaggerApplicationComponent.create();
-
-    public ApplicationComponent getApplicationComponent() {
-        return applicationComponent;
-    }
-}
+class SampleViewModel @AssistedViewModel constructor(private val repository: Repository) : ViewModel()

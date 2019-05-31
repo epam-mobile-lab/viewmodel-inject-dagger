@@ -14,23 +14,16 @@
  * limitations under the License.
  */
 
-package com.epam.viewmodelinjectionref.ui.network;
+package com.epam.viewmodelinjectionref.dagger
 
-import androidx.lifecycle.ViewModel;
+import com.epam.viewmodelinjectionref.data.Repository
 
-import com.epam.inject.viewmodel.AssistedViewModel;
-import com.epam.viewmodelinjectionref.data.NetworkService;
+import dagger.Module
+import dagger.Provides
 
-public class NetworkViewModel extends ViewModel {
+@Module
+abstract class ModelModule {
 
-    private final NetworkService service;
-
-    @AssistedViewModel
-    public NetworkViewModel(NetworkService service) {
-        this.service = service;
-    }
-
-    NetworkService getService() {
-        return service;
-    }
+    @Provides
+    fun provideRepository() = Repository("Sample Repository")
 }
