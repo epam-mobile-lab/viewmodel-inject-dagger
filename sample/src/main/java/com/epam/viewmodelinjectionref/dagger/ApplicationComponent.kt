@@ -16,13 +16,12 @@
 
 package com.epam.viewmodelinjectionref.dagger
 
-import com.epam.viewmodelinjectionref.SampleFragment
+import com.epam.viewmodelinjectionref.MainActivity
 import com.epam.viewmodelinjectionref.ViewModelInjectModule
-
 import dagger.Component
 
 @Component(modules = [ModelModule::class, ViewModelInjectModule::class])
 interface ApplicationComponent {
 
-    fun inject(fragment: SampleFragment)
+    fun inject(activity: MainActivity)
 }

@@ -17,24 +17,28 @@
 package com.epam.viewmodelinjectionref
 
 import android.os.Bundle
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProviders
 
 import com.epam.viewmodelinjectionref.R
+import javax.inject.Inject
 
 class MainActivity : AppCompatActivity() {
 
+    private lateinit var viewModel: SampleViewModel
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val fragmentManager = supportFragmentManager
-        if (fragmentManager.findFragmentByTag(FRAGMENT_SAMPLE) == null) {
-            fragmentManager.beginTransaction()
-                .add(SampleFragment(), FRAGMENT_SAMPLE)
-                .commit()
-        }
+        (this.applicationContext as MainApplication).applicationComponent.inject(this)
+        setContentView(R.layout.sample_activity)
+
+        findViewById<TextView>(R.id.repoName).text = viewModel.repository.name
     }
 
-    private companion object {
 
-        private const val FRAGMENT_SAMPLE = "sample"
+    @Inject
+    internal fun initViewModel(viewModelFactory: GeneratedViewModelFactory) {
+        viewModel = ViewModelProviders.of(this, viewModelFactory).get(SampleViewModel::class.java)
     }
 }

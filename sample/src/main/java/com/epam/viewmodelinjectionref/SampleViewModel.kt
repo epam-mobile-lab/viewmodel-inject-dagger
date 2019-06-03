@@ -21,4 +21,4 @@ import com.epam.viewmodelinjectionref.data.Repository
 
 import androidx.lifecycle.ViewModel
 
-class SampleViewModel @AssistedViewModel constructor(private val repository: Repository) : ViewModel()
+class SampleViewModel @AssistedViewModel constructor(val repository: Repository) : ViewModel()
