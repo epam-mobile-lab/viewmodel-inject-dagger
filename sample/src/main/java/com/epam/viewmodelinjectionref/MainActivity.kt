@@ -20,8 +20,8 @@ import android.os.Bundle
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProviders
+import com.epam.inject.viewmodel.AssistedViewModelFactory
 
-import com.epam.viewmodelinjectionref.R
 import javax.inject.Inject
 
 class MainActivity : AppCompatActivity() {
@@ -38,7 +38,7 @@ class MainActivity : AppCompatActivity() {
 
 
     @Inject
-    internal fun initViewModel(viewModelFactory: GeneratedViewModelFactory) {
+    internal fun initViewModel(viewModelFactory: AssistedViewModelFactory) {
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(SampleViewModel::class.java)
     }
 }
