@@ -18,9 +18,10 @@ package com.epam.viewmodelinjectionref
 
 import android.app.Application
 import com.epam.viewmodelinjectionref.dagger.ApplicationComponent
+import com.epam.viewmodelinjectionref.dagger.DaggerApplicationComponent
 
 
 class MainApplication : Application() {
 
-    val applicationComponent: ApplicationComponent = error("") //DaggerApplicationComponent.create()
+    val applicationComponent: ApplicationComponent = DaggerApplicationComponent.create()
 }

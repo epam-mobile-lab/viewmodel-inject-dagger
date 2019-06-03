@@ -22,7 +22,7 @@ import dagger.Module
 import dagger.Provides
 
 @Module
-abstract class ModelModule {
+class ModelModule {
 
     @Provides
     fun provideRepository() = Repository("Sample Repository")

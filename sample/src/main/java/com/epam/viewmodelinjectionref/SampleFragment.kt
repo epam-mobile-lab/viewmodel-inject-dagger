@@ -22,7 +22,6 @@ import javax.inject.Inject
 
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
-import generated.GeneratedViewModelFactory
 
 class SampleFragment : Fragment() {
 

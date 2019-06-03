@@ -14,6 +14,13 @@ android {
         versionName "1.0"
     }
 
+    kapt {
+        correctErrorTypes = true
+        arguments{
+            arg('generatedViewModelFactory', 'com.epam.viewmodelinjectionref.GeneratedViewModelFactory')
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled false
@@ -22,17 +29,11 @@ android {
     }
 }
 
-kapt {
-    arguments {
-        arg("generatedViewModelFactory": "com.epam.viewmodelinjectionref.GeneratedViewModelFactory")
-    }
-}
-
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_ver"
 
     implementation "com.google.dagger:dagger:$dagger_ver"
-    annotationProcessor "com.google.dagger:dagger-compiler:$dagger_ver"
+    kapt "com.google.dagger:dagger-compiler:$dagger_ver"
 
     implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle_ver"
     implementation "androidx.appcompat:appcompat:$app_compat_ver"

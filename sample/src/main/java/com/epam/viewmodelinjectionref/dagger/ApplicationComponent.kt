@@ -17,11 +17,11 @@
 package com.epam.viewmodelinjectionref.dagger
 
 import com.epam.viewmodelinjectionref.SampleFragment
+import com.epam.viewmodelinjectionref.ViewModelInjectModule
 
 import dagger.Component
-import generated.GeneratedViewModelFactory
 
-@Component(modules = [ModelModule::class, GeneratedViewModelFactory::class])
+@Component(modules = [ModelModule::class, ViewModelInjectModule::class])
 interface ApplicationComponent {
 
     fun inject(fragment: SampleFragment)
