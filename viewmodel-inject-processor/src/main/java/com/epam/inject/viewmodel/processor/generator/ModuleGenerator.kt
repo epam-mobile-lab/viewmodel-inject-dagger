@@ -51,6 +51,7 @@ internal class ModuleGenerator(pe: ProcessingEnvironment) {
     /**
      * Generates [TypeSpec] dagger module with set of ViewModels.
      * @param viewModels set of ViewModels that should be provided.
+     * @param moduleType type of module that provide [AssistedViewModelFactory]
      * @return [TypeSpec] that represent dagger module with provide methods to ViewModels.
      */
     fun generate(viewModels: Set<TypeElement>, moduleType: TypeSpec): TypeSpec {
@@ -59,7 +60,7 @@ internal class ModuleGenerator(pe: ProcessingEnvironment) {
             .addModifiers(Modifier.PUBLIC)
             .addAnnotation(AnnotationSpec
                 .builder(Module::class.java)
-                .addMember("includes", "\$L.class", moduleType.name)
+                .addMember("includes", "${moduleType.name}.class")
                 .build()
             )
             .addMethods(generateProvideMethods(viewModels))

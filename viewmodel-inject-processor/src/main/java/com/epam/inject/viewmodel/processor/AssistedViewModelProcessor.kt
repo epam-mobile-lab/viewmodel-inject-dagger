@@ -60,7 +60,7 @@ internal class AssistedViewModelProcessor : AbstractProcessor() {
     }
 
     /**
-     * Processes a set of annotated classes to generate dagger module and [ViewModelProvider.Factory] implementation.
+     * Processes a set of annotated classes to generate dagger modules(for provide factory and ViewModels) and [ViewModelProvider.Factory] implementation.
      *
      * @param elements annotation for processing.
      * @param re container for the information about the current round of the generation.

@@ -68,7 +68,7 @@ class SampleViewModel @AssistedViewModel constructor(repository:Repository): Vie
 @Module(include = [ViewModelInjectModule::class])
 class AppModule
 ```
-* Inject a `ViewModel` implementation in the usual way:
+* Inject a `AssistedViewModelFactory' implementation in the usual way:
 
 ```kotlin
 class SampleFragment: Fragment {
@@ -81,7 +81,7 @@ class SampleFragment: Fragment {
     }
 
     @Inject
-    fun initViewModel(viewModelFactory: SampleViewModelsFactory) {
+    fun initViewModel(viewModelFactory: AssistedViewModelFactory) {
         mViewModel = 
             ViewModelProviders.of(this, viewModelFactory).get(SampleViewModel::class.java)
     }
@@ -97,7 +97,7 @@ Example for APT:
 ```groovy
 javaCompileOptions {
     annotationProcessorOptions {
-         arguments = ["generatedViewModelFactory": "generatedViewModelFactory"]
+         arguments = ["generatedViewModelFactory": "com.sample.SampleViewModelFactory"]
     }
 }
 ```
@@ -106,7 +106,7 @@ for KAPT:
 ```groovy
 kapt {
     arguments {
-        arg("generatedViewModelFactory", "generatedViewModelFactory")
+        arg("generatedViewModelFactory", "com.sample.SampleViewModelFactory")
     }
 }
 ```

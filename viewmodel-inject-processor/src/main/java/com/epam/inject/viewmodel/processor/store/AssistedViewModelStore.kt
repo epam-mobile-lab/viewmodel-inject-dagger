@@ -18,7 +18,6 @@ package com.epam.inject.viewmodel.processor.store
 
 import com.epam.inject.viewmodel.AssistedViewModel
 import com.epam.inject.viewmodel.processor.error
-import java.lang.RuntimeException
 import javax.annotation.processing.ProcessingEnvironment
 import javax.annotation.processing.RoundEnvironment
 import javax.lang.model.element.Element
@@ -47,11 +46,9 @@ internal class AssistedViewModelStore(processingEnv: ProcessingEnvironment) {
      *         false - otherwise.
      */
     fun process(roundEnvironment: RoundEnvironment): Boolean {
-        val viewModelType: TypeElement? = elementUtils.getTypeElement("androidx.lifecycle.ViewModel")
-        if (viewModelType == null) {
-            messager.error("androidx.lifecycle.ViewModel type was not found")
-            throw RuntimeException()
-        }
+        val viewModelType: TypeElement =
+            elementUtils.getTypeElement("androidx.lifecycle.ViewModel")
+                ?: error("androidx.lifecycle.ViewModel type was not found")
 
         roundEnvironment.rootElements.forEach { element ->
             val annotatedConstructors = findConstructors(element as TypeElement)
@@ -97,19 +94,17 @@ internal class AssistedViewModelStore(processingEnv: ProcessingEnvironment) {
         elementType: TypeElement,
         expectedSuperType: TypeElement,
         constructors: List<Element>
-    ): Boolean {
-        if (constructors.size > 1) {
-            messager.error(
-                "Class ${elementType.qualifiedName} has more then one constructor " +
-                        "marked with ${com.epam.inject.viewmodel.AssistedViewModel::class.java.simpleName} " +
-                        "annotation"
-            )
-            return false
-        } else if (!typeUtils.isAssignable(elementType.asType(), expectedSuperType.asType())) {
-            messager.error("Class ${elementType.qualifiedName} is not assignable to ${expectedSuperType.qualifiedName}")
-            return false
-        } else {
-            return true
-        }
+    ): Boolean = if (constructors.size > 1) {
+        messager.error(
+            "Class ${elementType.qualifiedName} has more then one constructor " +
+                    "marked with ${com.epam.inject.viewmodel.AssistedViewModel::class.java.simpleName} " +
+                    "annotation"
+        )
+        false
+    } else if (!typeUtils.isAssignable(elementType.asType(), expectedSuperType.asType())) {
+        messager.error("Class ${elementType.qualifiedName} is not assignable to ${expectedSuperType.qualifiedName}")
+        false
+    } else {
+        true
     }
 }

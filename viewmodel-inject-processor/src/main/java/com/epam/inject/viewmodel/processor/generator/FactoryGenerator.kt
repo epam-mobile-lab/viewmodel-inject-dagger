@@ -68,14 +68,20 @@ internal class FactoryGenerator(processingEnvironment: ProcessingEnvironment) {
             .build()
     }
 
+    /**
+     * Generate module for provide [AssistedViewModelFactory]
+     */
     fun generateFactoryModule(factoryType: TypeSpec): TypeSpec {
-        return TypeSpec
-            .classBuilder("${viewModelFactoryName}Module")
+        return TypeSpec.classBuilder("${viewModelFactoryName}Module")
             .addModifiers(Modifier.PUBLIC)
             .addAnnotation(Module::class.java)
             .addMethod(generateProvideMethod(factoryType))
             .build()
     }
+
+    /**
+     * Generate provide method for dagger module [AssistedViewModelFactory]
+     */
 
     private fun generateProvideMethod(factoryType: TypeSpec): MethodSpec {
         val mapType = generateMapType(generateWildCardClass(), generateTypeParameterizedProvider())
@@ -85,7 +91,7 @@ internal class FactoryGenerator(processingEnvironment: ProcessingEnvironment) {
             .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
             .addParameter(mapType, VIEWMODEL_FIELD_NAME)
             .returns(AssistedViewModelFactory::class.java)
-            .addStatement("return new \$L($VIEWMODEL_FIELD_NAME)", factoryType.name)
+            .addStatement("return new ${factoryType.name}($VIEWMODEL_FIELD_NAME)")
             .build()
     }
 
