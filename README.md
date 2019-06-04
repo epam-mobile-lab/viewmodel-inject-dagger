@@ -118,3 +118,8 @@ In this case factory name would be `SampleViewModelFactory` and both factory and
 * Constructor's parameters that aren't in DI graph aren't supported.
 * ViewModel from non application (root) scope aren't supported.
 * For the kotlin primary constructor which has default values for all parameters @AssistedViewModel annotation can't be used.
+* In case of kapt usage generated module should be specified in the dagger's [Module] annotation with full name, e.g. 
+
+```kotlin
+@Module(include = [com.epam.generated.ViewModelInjectModule::class])
+```
