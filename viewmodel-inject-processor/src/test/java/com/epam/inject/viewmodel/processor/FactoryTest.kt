@@ -163,4 +163,40 @@ class FactoryTest {
                 .generatedSourceFile(factoryName)
                 .hasSourceEquivalentTo(expectedFactory)
     }
+
+    @Test
+    fun `factory module generation`() {
+
+        val expectedFactory = JavaFileObjects.forSourceString(
+                "generated.GeneratedViewModelFactoryModule",
+                """
+            package generated;
+
+            import androidx.lifecycle.ViewModel;
+            import com.epam.inject.viewmodel.AssistedViewModelFactory;
+            import dagger.Module;
+            import dagger.Provides;
+            import java.lang.Class;
+            import java.util.Map;
+            import javax.inject.Provider;
+
+            @Module
+            public class GeneratedViewModelFactoryModule {
+                @Provides
+                public static AssistedViewModelFactory provide_GeneratedViewModelFactory(
+                    Map<Class<? extends ViewModel>, Provider<ViewModel>> viewModelMap) {
+                        return new GeneratedViewModelFactory(viewModelMap);
+                }
+            }
+        """.trimIndent()
+        )
+
+        val compilation = Compiler.javac().withProcessors(processor).compile(viewModelClass)
+
+        CompilationSubject.assertThat(compilation)
+                .succeeded()
+        CompilationSubject.assertThat(compilation)
+                .generatedSourceFile("generated.GeneratedViewModelFactoryModule")
+                .hasSourceEquivalentTo(expectedFactory)
+    }
 }

@@ -17,10 +17,9 @@
 package com.epam.viewmodelinjectionref.dagger
 
 import com.epam.viewmodelinjectionref.MainActivity
-import com.epam.viewmodelinjectionref.ViewModelInjectModule
 import dagger.Component
 
-@Component(modules = [ModelModule::class, ViewModelInjectModule::class])
+@Component(modules = [ModelModule::class, com.epam.viewmodelinjectionref.ViewModelInjectModule::class])
 interface ApplicationComponent {
 
     fun inject(activity: MainActivity)
