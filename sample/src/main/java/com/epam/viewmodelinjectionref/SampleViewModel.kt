@@ -14,20 +14,11 @@
  * limitations under the License.
  */
 
-package com.epam.viewmodelinjectionref.ui;
+package com.epam.viewmodelinjectionref
 
-import android.os.Bundle;
-import androidx.appcompat.app.AppCompatActivity;
+import com.epam.inject.viewmodel.AssistedViewModel
+import com.epam.viewmodelinjectionref.data.Repository
 
-import com.epam.viewmodelinjectionref.R;
+import androidx.lifecycle.ViewModel
 
-public class MainActivity extends AppCompatActivity{
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.main_activity);
-    }
-
-
-}
+class SampleViewModel @AssistedViewModel constructor(val repository: Repository) : ViewModel()

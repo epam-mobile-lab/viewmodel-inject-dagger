@@ -14,18 +14,16 @@
  * limitations under the License.
  */
 
-package com.epam.viewmodelinjectionref;
+package com.epam.viewmodelinjectionref.dagger
 
-import android.app.Application;
+import com.epam.viewmodelinjectionref.data.Repository
 
-import com.epam.viewmodelinjectionref.di.ApplicationComponent;
-import com.epam.viewmodelinjectionref.di.DaggerApplicationComponent;
+import dagger.Module
+import dagger.Provides
 
-public class MainApplication extends Application {
+@Module
+class ModelModule {
 
-    private final ApplicationComponent applicationComponent = DaggerApplicationComponent.create();
-
-    public ApplicationComponent getApplicationComponent() {
-        return applicationComponent;
-    }
+    @Provides
+    fun provideRepository() = Repository("Sample Repository")
 }

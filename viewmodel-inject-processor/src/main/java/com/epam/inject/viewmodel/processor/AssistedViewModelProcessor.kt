@@ -60,7 +60,7 @@ internal class AssistedViewModelProcessor : AbstractProcessor() {
     }
 
     /**
-     * Processes a set of annotated classes to generate dagger module and [ViewModelProvider.Factory] implementation.
+     * Processes a set of annotated classes to generate dagger modules(for provide factory and ViewModels) and [ViewModelProvider.Factory] implementation.
      *
      * @param elements annotation for processing.
      * @param re container for the information about the current round of the generation.
@@ -69,9 +69,12 @@ internal class AssistedViewModelProcessor : AbstractProcessor() {
     override fun process(elements: MutableSet<out TypeElement>, re: RoundEnvironment): Boolean {
         val isFound = store.process(re)
         if (isFound) {
-            val genClassModule = ModuleGenerator(processingEnv).generate(store.foundViewModels)
-            val genClassFactory = FactoryGenerator(processingEnv).generate()
-            writeClasses(genClassModule, genClassFactory)
+            val factoryGenerator = FactoryGenerator(processingEnv)
+            val genClassFactory = factoryGenerator.generateFactoryClass()
+            val genFactoryModule = factoryGenerator.generateFactoryModule(genClassFactory)
+            val genClassModule =
+                ModuleGenerator(processingEnv).generate(store.foundViewModels, genFactoryModule)
+            writeClasses(genClassFactory, genFactoryModule, genClassModule)
         }
         return true
     }

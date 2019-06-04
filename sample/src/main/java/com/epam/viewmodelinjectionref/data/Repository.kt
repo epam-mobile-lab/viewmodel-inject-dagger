@@ -14,17 +14,6 @@
  * limitations under the License.
  */
 
-package com.epam.viewmodelinjectionref.data;
+package com.epam.viewmodelinjectionref.data
 
-public class Repository {
-
-    private final String name;
-
-    public Repository(String name) {
-        this.name = name;
-    }
-
-    public String getName() {
-        return name;
-    }
-}
+class Repository(val name: String)
