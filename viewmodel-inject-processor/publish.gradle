@@ -71,6 +71,11 @@ install {
                         name 'Dzmitry Kuzmin'
                         email 'dzmitry_kuzmin@epam.com'
                     }
+                    developer {
+                        id 'stivskor'
+                        name 'Stsiapan Skarabahatska'
+                        email 'stsiapan_skarabahatska@epam.com'
+                    }
                 }
                 scm {
                     connection gitRepoUrl
