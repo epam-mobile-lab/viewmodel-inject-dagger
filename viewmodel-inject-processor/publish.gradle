@@ -1,9 +1,24 @@
 apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: 'maven-publish'
 apply plugin: 'com.jfrog.bintray'
 
 def siteUrl = 'https://github.com/epam-mobile-lab/viewmodel-inject-dagger'
 def gitRepoUrl = 'https://github.com/epam-mobile-lab/viewmodel-inject-dagger.git'
 
+task sourcesJar(type: Jar) {
+    from sourceSets.main.java.srcDirs
+    classifier = 'sources'
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives javadocJar
+    archives sourcesJar
+}
 
 publishing {
     publications {
@@ -25,7 +40,7 @@ bintray {
     configurations = ['archives']
 
     pkg {
-        repo = 'maven'
+        repo = 'ViewModelInject'
         name = 'viewmodel-inject-dagger'
         desc = 'Injection of dependecies into viewmodel with dagger'
         websiteUrl = siteUrl
