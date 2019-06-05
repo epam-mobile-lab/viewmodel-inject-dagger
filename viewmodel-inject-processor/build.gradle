@@ -1,7 +1,7 @@
 import org.gradle.internal.jvm.Jvm
 
 ext {
-    group = 'com.epam.inject.viewmodel'
+    curGroup = 'com.epam.inject.viewmodel'
     artifact = 'processor'
     ver = '0.1.0'
 }
