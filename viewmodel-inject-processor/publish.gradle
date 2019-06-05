@@ -35,7 +35,7 @@ bintray {
         publicDownloadNumbers = true
 
         githubRepo = 'epam-mobile-lab/viewmodel-inject-dagger'
-        githubReleaseNotesFile = 'README.md'
+        //githubReleaseNotesFile = 'README.md'
 
         version {
             name = ver
@@ -68,6 +68,11 @@ install {
                         id 'dimondik'
                         name 'Dzmitry Kuzmin'
                         email 'dzmitry_kuzmin@epam.com'
+                    }
+                    developer {
+                        id 'stivskor'
+                        name 'Stsiapan Skarabahatska'
+                        email 'stsiapan_skarabahatska@epam.com'
                     }
                 }
                 scm {
