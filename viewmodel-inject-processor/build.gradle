@@ -1,11 +1,5 @@
 import org.gradle.internal.jvm.Jvm
 
-ext {
-    curGroup = 'com.epam.inject.viewmodel'
-    artifact = 'processor'
-    ver = '0.1.0'
-}
-
 apply plugin: 'java-library'
 apply plugin: 'kotlin'
 apply plugin: 'io.gitlab.arturbosch.detekt'
