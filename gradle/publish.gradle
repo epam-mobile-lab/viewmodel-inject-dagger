@@ -1,0 +1,90 @@
+apply plugin: 'maven-publish'
+apply plugin: 'com.jfrog.bintray'
+
+
+def siteUrl = 'https://github.com/epam-mobile-lab/viewmodel-inject-dagger'
+def gitRepoUrl = 'https://github.com/epam-mobile-lab/viewmodel-inject-dagger.git'
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            groupId = curGroup
+            artifactId = project.ext.curArtifactId
+            version = ver
+
+            from components.java
+            artifact sourcesJar
+
+            pom {
+                name = 'Viewmodel Injection for Dagger'
+                groupId curGroup
+                artifactId curArtifactId
+                version ver
+                packaging 'aar'
+                url = siteUrl
+                licenses {
+                    license {
+                        name = 'The Apache Software License, Version 2.0'
+                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'kirich1409'
+                        name = 'Kirill Rozov'
+                        email = 'krl.rozov@gmail.com'
+                    }
+                    developer {
+                        id = 'dimondik'
+                        name = 'Dzmitry Kuzmin'
+                        email = 'dzmitry_kuzmin@epam.com'
+                    }
+                    developer {
+                        id = 'stivskor'
+                        name = 'Stsiapan Skarabahatska'
+                        email = 'stsiapan_skarabahatska@epam.com'
+                    }
+                }
+
+                scm {
+                    connection = gitRepoUrl
+                    developerConnection = gitRepoUrl
+                    url = siteUrl
+                }
+            }
+        }
+    }
+}
+
+bintray {
+    user = project.hasProperty('user') ? project.property('user') : System.getenv('BINTRAY_USER')
+    key = project.hasProperty('apiKey') ? project.property('apiKey') : System.getenv('BINTRAY_API_KEY')
+    publications = ['mavenJava']
+
+    pkg {
+        repo = 'viewmodel-inject-dagger'
+        name = project.ext.bintrayName
+        userOrg = 'EPAM'
+        websiteUrl = siteUrl
+        vcsUrl = gitRepoUrl
+        issueTrackerUrl = "$siteUrl/issues"
+        vcsUrl = gitRepoUrl
+        licenses = ['Apache-2.0']
+        labels = ['Android', 'Dagger', 'Architecture Components', 'ViewModel']
+        publicDownloadNumbers = true
+
+        githubRepo = 'epam-mobile-lab/viewmodel-inject-dagger'
+        githubReleaseNotesFile = 'CHANGELOG.md'
+
+        version {
+            name = ver
+            desc = 'Viewmodel Injection for Dagger'
+            released = new Date()
+        }
+    }
+}

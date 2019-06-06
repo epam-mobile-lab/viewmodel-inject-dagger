@@ -447,7 +447,10 @@ class ModuleTest {
         compileAndAssertSuccess(expectedModule, firstViewModelClass, secondViewModelClass)
     }
 
-    private fun compileAndAssertSuccess(expectedModule: JavaFileObject, vararg files: JavaFileObject) {
+    private fun compileAndAssertSuccess(
+        expectedModule: JavaFileObject,
+        vararg files: JavaFileObject
+    ) {
         val compilation = Compiler.javac().withProcessors(processor).compile(*files)
 
         CompilationSubject.assertThat(compilation)

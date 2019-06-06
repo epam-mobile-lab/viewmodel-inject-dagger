@@ -1,4 +1,4 @@
-autoCorrect: true
+autoCorrect: false
 
 test-pattern:
   active: true

@@ -1,8 +1,12 @@
 apply plugin: 'java-library'
-apply from: "publish.gradle"
 
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
+
+
+ext.curArtifactId = 'annotation'
+ext.bintrayName = 'viewmodel-inject-annotations'
+apply from: rootProject.file("gradle/publish.gradle").absolutePath
 
 dependencies {
     compileOnly "com.google.dagger:dagger:$dagger_ver"

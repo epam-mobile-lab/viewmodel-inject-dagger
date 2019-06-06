@@ -1,5 +1,8 @@
 apply plugin: 'java-library'
-apply from: "publish.gradle"
+
+ext.curArtifactId = 'stub'
+ext.bintrayName = 'viewmodel-androidx-stub'
+apply from: rootProject.file("gradle/publish.gradle").absolutePath
 
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8

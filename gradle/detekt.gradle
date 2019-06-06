@@ -1,5 +1,7 @@
+apply plugin: 'io.gitlab.arturbosch.detekt'
+
 detekt {
-    config = files("detekt-config.yml")
+    config = rootProject.files("detekt-config.yml")
     reports {
         html {
             enabled = true
