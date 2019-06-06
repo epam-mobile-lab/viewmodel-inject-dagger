@@ -25,7 +25,7 @@ import com.epam.inject.viewmodel.processor.store.AssistedViewModelStore
 import com.squareup.javapoet.TypeSpec
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-import java.util.*
+import java.util.Locale
 import javax.annotation.processing.AbstractProcessor
 import javax.annotation.processing.Messager
 import javax.annotation.processing.ProcessingEnvironment

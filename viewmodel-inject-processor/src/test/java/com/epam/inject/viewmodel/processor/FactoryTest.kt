@@ -81,13 +81,13 @@ class FactoryTest {
               public <T extends ViewModel> T create(Class<T> modelClass) {
                 final Provider<ViewModel> vmProvider = viewModelMap.get(modelClass);
                 if(vmProvider == null) {
-                  throw new IllegalArgumentException("ViewModel isn't supported by the factory.");
+                   throw new IllegalArgumentException(modelClass.getSimpleName() + " isn't supported by the AssistedViewModelFactory.");
                 }
                 final ViewModel viewModel = vmProvider.get();
                 if(modelClass.isAssignableFrom(viewModel.getClass())) {
                   return (T) viewModel;
                 } else {
-                  throw new IllegalArgumentException("Another ViewModel implementation was expected.");
+                  throw new IllegalArgumentException(modelClass.getSimpleName() + " expected to be subtype of ViewModel class.");
                 }
               }
             }

@@ -247,7 +247,7 @@ internal class FactoryGenerator {
             )
             .beginControlFlow("if(%s == null)".format("vmProvider"))
             .addStatement(
-                "throw new \$T(\"%s\")".format("ViewModel isn't supported by the factory."),
+                "throw new \$T(modelClass.getSimpleName() + \"%s\")".format(" isn't supported by the AssistedViewModelFactory."),
                 IllegalArgumentException::class.java
             )
             .endControlFlow()
@@ -264,7 +264,7 @@ internal class FactoryGenerator {
             .addStatement("return (\$T) %s".format("viewModel"), TypeVariableName.get("T"))
             .nextControlFlow("else")
             .addStatement(
-                "throw new \$T(\"%s\")".format("Another ViewModel implementation was expected."),
+                "throw new \$T(modelClass.getSimpleName() + \"%s\")".format(" expected to be subtype of ${ViewModel::class.java.simpleName} class."),
                 IllegalArgumentException::class.java
             )
             .endControlFlow()
