@@ -50,8 +50,8 @@ In order to use ViewModel Inject library in the code a few simple steps should b
 
 ```groovy
 dependencies {
-    implementation 'com.epam.dvmi:annotation:1.0.0-alpha01'
-    annotationProcessor 'com.epam.dvmi:processor:1.0.0-alpha01'
+    implementation 'com.epam.inject.viewmodel:annotation:1.0.0-alpha01'
+    annotationProcessor 'com.epam.inject.viewmodel:processor:1.0.0-alpha01'
 }
 ```
 

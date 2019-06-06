@@ -21,7 +21,7 @@ bintray {
     publications = ['maven']
 
     pkg {
-        repo = 'ViewModelInject'
+        repo = 'viewmodel-inject-dagger'
         name = 'viewmodel-inject-dagger'
         desc = 'Injection of dependecies into viewmodel with dagger'
         websiteUrl = siteUrl
