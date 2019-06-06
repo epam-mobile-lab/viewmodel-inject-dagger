@@ -50,8 +50,8 @@ In order to use ViewModel Inject library in the code a few simple steps should b
 
 ```groovy
 dependencies {
-    implementation 'com.epam.inject.viewmodel:annotation:1.0.0-alpha01'
-    annotationProcessor 'com.epam.inject.viewmodel:processor:1.0.0-alpha01'
+    implementation 'com.epam.inject.viewmodel:annotation:1.0.0-alpha02'
+    annotationProcessor 'com.epam.inject.viewmodel:processor:1.0.0-alpha02'
 }
 ```
 
@@ -97,5 +97,5 @@ class SampleFragment: Fragment {
 * In case of kapt usage generated module should be specified in the dagger's [Module] annotation with full name, e.g. 
 
 ```kotlin
-@Module(include = [com.epam.generated.ViewModelInjectModule::class])
+@Module(include = [com.epam.inject.viewmodel.ViewModelInjectModule::class])
 ```
