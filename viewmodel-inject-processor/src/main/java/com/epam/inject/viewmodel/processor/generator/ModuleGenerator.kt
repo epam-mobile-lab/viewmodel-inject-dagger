@@ -20,6 +20,8 @@ import androidx.lifecycle.ViewModel
 import com.epam.inject.viewmodel.AssistedViewModel
 import com.epam.inject.viewmodel.ViewModelKey
 import com.epam.inject.viewmodel.processor.AssistedViewModelProcessor.Companion.generateBaseComment
+import com.epam.inject.viewmodel.processor.generator.FactoryGenerator.Companion.DEFAULT_FACTORY_MODULE_NAME
+import com.epam.inject.viewmodel.processor.generator.ModuleGenerator.Companion.name
 import com.epam.inject.viewmodel.processor.note
 import com.squareup.javapoet.AnnotationSpec
 import com.squareup.javapoet.ClassName
@@ -51,16 +53,15 @@ internal class ModuleGenerator(pe: ProcessingEnvironment) {
     /**
      * Generates [TypeSpec] dagger module with set of ViewModels.
      * @param viewModels set of ViewModels that should be provided.
-     * @param moduleType type of module that provide [AssistedViewModelFactory]
      * @return [TypeSpec] that represent dagger module with provide methods to ViewModels.
      */
-    fun generate(viewModels: Set<TypeElement>, moduleType: TypeSpec): TypeSpec {
+    fun generate(viewModels: Set<TypeElement>): TypeSpec {
         return TypeSpec.classBuilder(name)
             .addJavadoc(generateBaseComment())
             .addModifiers(Modifier.PUBLIC)
             .addAnnotation(AnnotationSpec
                 .builder(Module::class.java)
-                .addMember("includes", "${moduleType.name}.class")
+                .addMember("includes", "$DEFAULT_FACTORY_MODULE_NAME.class")
                 .build()
             )
             .addMethods(generateProvideMethods(viewModels))

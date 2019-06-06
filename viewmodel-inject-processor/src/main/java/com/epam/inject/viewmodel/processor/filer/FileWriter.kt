@@ -16,7 +16,6 @@
 
 package com.epam.inject.viewmodel.processor.filer
 
-import com.epam.inject.viewmodel.processor.AssistedViewModelProcessor.Companion.KEY_NAME_FACTORY_OPTION
 import com.epam.inject.viewmodel.processor.error
 import com.epam.inject.viewmodel.processor.note
 import com.squareup.javapoet.JavaFile
@@ -34,18 +33,12 @@ internal class FileWriter(pe: ProcessingEnvironment) {
     private val filer = pe.filer
 
     /**
-     * Package for all generated classes.
-     * If [KEY_NAME_FACTORY_OPTION] defined - get from build, else [DEFAULT_PACKAGE].
-     */
-    private val packageName = pe.options[KEY_NAME_FACTORY_OPTION]?.substringBeforeLast('.') ?: DEFAULT_PACKAGE
-
-    /**
      * Creates source file from [TypeSpec] using [JavaFile.builder], also using Filer(from [ProcessingEnvironment]).
-     * Path - [packageName], filename - [genClass] name.
+     * Path - [DEFAULT_PACKAGE], filename - [genClass] name.
      * @param genClass class spec to writing in the file.
      */
     fun writeToFile(genClass: TypeSpec) {
-        val genFile: JavaFile = JavaFile.builder(packageName, genClass).build()
+        val genFile: JavaFile = JavaFile.builder(DEFAULT_PACKAGE, genClass).build()
 
         try {
             genFile.writeTo(filer)
@@ -57,6 +50,6 @@ internal class FileWriter(pe: ProcessingEnvironment) {
     }
 
     private companion object {
-        private const val DEFAULT_PACKAGE = "generated"
+        private const val DEFAULT_PACKAGE = "com.epam.inject.viewmodel"
     }
 }

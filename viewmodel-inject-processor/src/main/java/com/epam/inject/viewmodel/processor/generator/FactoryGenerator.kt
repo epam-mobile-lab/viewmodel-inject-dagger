@@ -19,7 +19,6 @@ package com.epam.inject.viewmodel.processor.generator
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.epam.inject.viewmodel.AssistedViewModelFactory
-import com.epam.inject.viewmodel.processor.AssistedViewModelProcessor.Companion.KEY_NAME_FACTORY_OPTION
 import com.epam.inject.viewmodel.processor.AssistedViewModelProcessor.Companion.generateBaseComment
 import com.squareup.javapoet.ClassName
 import com.squareup.javapoet.FieldSpec
@@ -31,7 +30,6 @@ import com.squareup.javapoet.TypeVariableName
 import com.squareup.javapoet.WildcardTypeName
 import dagger.Module
 import dagger.Provides
-import javax.annotation.processing.ProcessingEnvironment
 import javax.inject.Provider
 import javax.lang.model.element.Modifier
 
@@ -40,14 +38,7 @@ import javax.lang.model.element.Modifier
  * This factory later would be used by the [ViewModelProvider] to provide created ViewModels to the
  * activity or fragment.
  */
-internal class FactoryGenerator(processingEnvironment: ProcessingEnvironment) {
-
-    /**
-     * Defines name of the generated factory and come as processor parameter.
-     * In case there was no name provided [DEFAULT_FACTORY_NAME] is used.
-     */
-    private val viewModelFactoryName =
-        processingEnvironment.options[KEY_NAME_FACTORY_OPTION]?.substringAfterLast('.') ?: DEFAULT_FACTORY_NAME
+internal class FactoryGenerator {
 
     /**
      * Generates factory to which would store ViewModels created by dagger.
@@ -58,7 +49,7 @@ internal class FactoryGenerator(processingEnvironment: ProcessingEnvironment) {
         val mapType = generateMapType(generateWildCardClass(), typeParameterizedProvider)
         val classParam = generateClassParam(generateParameterType())
 
-        return TypeSpec.classBuilder(viewModelFactoryName)
+        return TypeSpec.classBuilder(DEFAULT_FACTORY_NAME)
             .addJavadoc(generateBaseComment())
             .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
             .superclass(AssistedViewModelFactory::class.java)
@@ -69,10 +60,11 @@ internal class FactoryGenerator(processingEnvironment: ProcessingEnvironment) {
     }
 
     /**
-     * Generate module for provide [AssistedViewModelFactory]
+     * Generate dagger module for provide [AssistedViewModelFactory]
+     * Module will be named as [DEFAULT_FACTORY_MODULE_NAME] const
      */
     fun generateFactoryModule(factoryType: TypeSpec): TypeSpec {
-        return TypeSpec.classBuilder("${viewModelFactoryName}Module")
+        return TypeSpec.classBuilder("${DEFAULT_FACTORY_NAME}Module")
             .addModifiers(Modifier.PUBLIC)
             .addAnnotation(Module::class.java)
             .addMethod(generateProvideMethod(factoryType))
@@ -279,8 +271,9 @@ internal class FactoryGenerator(processingEnvironment: ProcessingEnvironment) {
             .build()
     }
 
-    private companion object {
+    companion object {
         private const val DEFAULT_FACTORY_NAME = "GeneratedViewModelFactory"
+        const val DEFAULT_FACTORY_MODULE_NAME = "GeneratedViewModelFactoryModule"
         private const val VIEWMODEL_FIELD_NAME = "viewModelMap"
     }
 }

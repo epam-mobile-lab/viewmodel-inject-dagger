@@ -25,13 +25,12 @@ import com.epam.inject.viewmodel.processor.store.AssistedViewModelStore
 import com.squareup.javapoet.TypeSpec
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-import java.util.Locale
-import javax.annotation.processing.RoundEnvironment
+import java.util.*
 import javax.annotation.processing.AbstractProcessor
 import javax.annotation.processing.Messager
 import javax.annotation.processing.ProcessingEnvironment
+import javax.annotation.processing.RoundEnvironment
 import javax.annotation.processing.SupportedAnnotationTypes
-import javax.annotation.processing.SupportedOptions
 import javax.annotation.processing.SupportedSourceVersion
 import javax.lang.model.SourceVersion
 import javax.lang.model.element.TypeElement
@@ -43,7 +42,6 @@ import javax.tools.Diagnostic
  */
 @SupportedAnnotationTypes("com.epam.inject.viewmodel.AssistedViewModel")
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
-@SupportedOptions("generatedViewModelFactory")
 internal class AssistedViewModelProcessor : AbstractProcessor() {
 
     /**
@@ -69,11 +67,11 @@ internal class AssistedViewModelProcessor : AbstractProcessor() {
     override fun process(elements: MutableSet<out TypeElement>, re: RoundEnvironment): Boolean {
         val isFound = store.process(re)
         if (isFound) {
-            val factoryGenerator = FactoryGenerator(processingEnv)
+            val factoryGenerator = FactoryGenerator()
             val genClassFactory = factoryGenerator.generateFactoryClass()
             val genFactoryModule = factoryGenerator.generateFactoryModule(genClassFactory)
             val genClassModule =
-                ModuleGenerator(processingEnv).generate(store.foundViewModels, genFactoryModule)
+                ModuleGenerator(processingEnv).generate(store.foundViewModels)
             writeClasses(genClassFactory, genFactoryModule, genClassModule)
         }
         return true
@@ -90,10 +88,6 @@ internal class AssistedViewModelProcessor : AbstractProcessor() {
     }
 
     companion object {
-        /**
-         * Name of the processor's parameter which define name of the factory should be generated.
-         */
-        const val KEY_NAME_FACTORY_OPTION = "generatedViewModelFactory"
 
         /**
          * Date time patter for the generation comment.
