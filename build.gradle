@@ -6,6 +6,8 @@ buildscript {
 
     dependencies {
         classpath 'com.android.tools.build:gradle:3.4.1'
+        classpath 'com.github.dcendents:android-maven-gradle-plugin:2.0'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4'
     }
 }
 
@@ -32,4 +34,9 @@ ext {
     dagger_ver = '2.20'
     ktlint_ver = '0.32.0'
     compile_testing_ver = '0.10'
+
+    siteUrl = 'https://github.com/epam-mobile-lab/viewmodel-inject-dagger'
+    gitRepoUrl = 'https://github.com/epam-mobile-lab/viewmodel-inject-dagger.git'
+    curGroup = 'com.epam.inject.viewmodel'
+    ver = '1.0.0-alpha01'
 }

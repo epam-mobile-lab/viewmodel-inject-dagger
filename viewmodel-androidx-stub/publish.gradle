@@ -2,7 +2,7 @@ apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: 'maven-publish'
 apply plugin: 'com.jfrog.bintray'
 
-def artifact = 'processor'
+ext.artifact = 'stub'
 
 publishing {
     publications {
@@ -10,6 +10,7 @@ publishing {
             groupId = curGroup
             artifactId = artifact
             version = ver
+
             from components.java
         }
     }
@@ -30,9 +31,7 @@ bintray {
         licenses = ['Apache-2.0']
         labels = ['android', 'dagger', 'kotlin']
         publicDownloadNumbers = true
-
         githubRepo = 'epam-mobile-lab/viewmodel-inject-dagger'
-        //githubReleaseNotesFile = 'README.md'
 
         version {
             name = ver
