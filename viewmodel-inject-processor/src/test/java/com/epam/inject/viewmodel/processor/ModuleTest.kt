@@ -55,12 +55,11 @@ class ModuleTest {
     fun `module with one viewmodel`() {
 
         val expectedModule = JavaFileObjects.forSourceString(
-                "generated.ViewModelInjectModule",
+            "com.epam.inject.viewmodel.ViewModelInjectModule",
                 """
-            package generated;
+            package com.epam.inject.viewmodel;
 
             import androidx.lifecycle.ViewModel;
-            import com.epam.inject.viewmodel.ViewModelKey;
             import dagger.Module;
             import dagger.Provides;
             import dagger.multibindings.IntoMap;
@@ -110,12 +109,11 @@ class ModuleTest {
                 )
 
         val expectedModule = JavaFileObjects.forSourceString(
-                "generated.ViewModelInjectModule",
+            "com.epam.inject.viewmodel.ViewModelInjectModule",
                 """
-            package generated;
+            package com.epam.inject.viewmodel;
 
             import androidx.lifecycle.ViewModel;
-            import com.epam.inject.viewmodel.ViewModelKey;
             import dagger.Module;
             import dagger.Provides;
             import dagger.multibindings.IntoMap;
@@ -176,12 +174,11 @@ class ModuleTest {
                 )
 
         val expectedModule = JavaFileObjects.forSourceString(
-                "generated.ViewModelInjectModule",
+            "com.epam.inject.viewmodel.ViewModelInjectModule",
                 """
-            package generated;
+            package com.epam.inject.viewmodel;
 
             import androidx.lifecycle.ViewModel;
-            import com.epam.inject.viewmodel.ViewModelKey;
             import dagger.Module;
             import dagger.Provides;
             import dagger.multibindings.IntoMap;
@@ -237,12 +234,11 @@ class ModuleTest {
                 )
 
         val expectedModule = JavaFileObjects.forSourceString(
-                "generated.ViewModelInjectModule",
+            "com.epam.inject.viewmodel.ViewModelInjectModule",
                 """
-            package generated;
+            package com.epam.inject.viewmodel;
 
             import androidx.lifecycle.ViewModel;
-            import com.epam.inject.viewmodel.ViewModelKey;
             import dagger.Module;
             import dagger.Provides;
             import dagger.multibindings.IntoMap;
@@ -339,12 +335,11 @@ class ModuleTest {
                 )
 
         val expectedModule = JavaFileObjects.forSourceString(
-                "generated.ViewModelInjectModule",
+            "com.epam.inject.viewmodel.ViewModelInjectModule",
                 """
-            package generated;
+            package com.epam.inject.viewmodel;
 
             import androidx.lifecycle.ViewModel;
-            import com.epam.inject.viewmodel.ViewModelKey;
             import dagger.Module;
             import dagger.Provides;
             import dagger.multibindings.IntoMap;
@@ -414,12 +409,11 @@ class ModuleTest {
             )
 
         val expectedModule = JavaFileObjects.forSourceString(
-            "generated.ViewModelInjectModule",
+            "com.epam.inject.viewmodel.ViewModelInjectModule",
             """
-            package generated;
+            package com.epam.inject.viewmodel;
 
             import androidx.lifecycle.ViewModel;
-            import com.epam.inject.viewmodel.ViewModelKey;
             import dagger.Module;
             import dagger.Provides;
             import dagger.multibindings.IntoMap;
@@ -459,7 +453,7 @@ class ModuleTest {
         CompilationSubject.assertThat(compilation)
                 .succeeded()
         CompilationSubject.assertThat(compilation)
-                .generatedSourceFile("generated.ViewModelInjectModule")
+            .generatedSourceFile("com.epam.inject.viewmodel.ViewModelInjectModule")
                 .hasSourceEquivalentTo(expectedModule)
     }
 }

@@ -38,5 +38,5 @@ ext {
     siteUrl = 'https://github.com/epam-mobile-lab/viewmodel-inject-dagger'
     gitRepoUrl = 'https://github.com/epam-mobile-lab/viewmodel-inject-dagger.git'
     curGroup = 'com.epam.inject.viewmodel'
-    ver = '1.0.0-alpha01'
+    ver = '1.0.0-alpha02'
 }

@@ -14,12 +14,6 @@ android {
         versionName "1.0"
     }
 
-    kapt {
-        arguments{
-            arg('generatedViewModelFactory', 'com.epam.viewmodelinjectionref.GeneratedViewModelFactory')
-        }
-    }
-
     buildTypes {
         release {
             minifyEnabled false

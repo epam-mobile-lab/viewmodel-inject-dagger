@@ -2,16 +2,22 @@ apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: 'maven-publish'
 apply plugin: 'com.jfrog.bintray'
 
-ext.artifact = 'stub'
+ext.curArtifactId = 'stub'
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
 
 publishing {
     publications {
         maven(MavenPublication) {
             groupId = curGroup
-            artifactId = artifact
+            artifactId = curArtifactId
             version = ver
 
             from components.java
+            artifact sourcesJar
         }
     }
 }
@@ -22,7 +28,7 @@ bintray {
     publications = ['maven']
 
     pkg {
-        repo = 'ViewModelInject'
+        repo = 'viewmodel-inject-dagger'
         name = 'viewmodel-inject-dagger'
         desc = 'Injection of dependecies into viewmodel with dagger'
         websiteUrl = siteUrl
@@ -46,7 +52,7 @@ install {
         pom {
             project {
                 groupId curGroup
-                artifactId artifact
+                artifactId curArtifactId
                 version ver
                 packaging 'aar'
                 name 'Viewmodel Injection for Dagger'
