@@ -2,15 +2,22 @@ apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: 'maven-publish'
 apply plugin: 'com.jfrog.bintray'
 
-def artifact = 'annotation'
+def curArtifactId = 'annotation'
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
 
 publishing {
     publications {
         maven(MavenPublication) {
             groupId = curGroup
-            artifactId = artifact
+            artifactId = curArtifactId
             version = ver
+
             from components.java
+            artifact sourcesJar
         }
     }
 }
@@ -45,7 +52,7 @@ install {
         pom {
             project {
                 groupId curGroup
-                artifactId artifact
+                artifactId curArtifactId
                 version ver
                 packaging 'aar'
                 name 'Viewmodel Injection for Dagger'
