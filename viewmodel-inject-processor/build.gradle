@@ -24,5 +24,6 @@ dependencies {
     compileOnly "com.google.dagger:dagger:$dagger_ver"
 
     testImplementation "com.google.testing.compile:compile-testing:$compile_testing_ver"
+    testImplementation "com.google.dagger:dagger:$dagger_ver"
     testImplementation files(Jvm.current().getToolsJar())
 }
