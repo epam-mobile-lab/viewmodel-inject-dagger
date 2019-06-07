@@ -10,6 +10,6 @@ android:
     - android-28
 
 script:
-  - ./gradlew ktlint
+  - ./gradlew ktlintCheck
   - ./gradlew detekt
   - ./gradlew test build
