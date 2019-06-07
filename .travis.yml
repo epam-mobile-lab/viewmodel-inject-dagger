@@ -1,9 +1,15 @@
-language: java
-
+language: android
 jdk:
   - oraclejdk8
 
+android:
+  components:
+    - tools
+    - platform-tools
+    - build-tools-28.0.3
+    - android-28
+
 script:
-  - ./gradlew ktlint
-  - ./gradlew detekt
-  - ./gradlew test build
+  - ./gradle ktlint
+  - ./gradle detekt
+  - ./gradle test build
