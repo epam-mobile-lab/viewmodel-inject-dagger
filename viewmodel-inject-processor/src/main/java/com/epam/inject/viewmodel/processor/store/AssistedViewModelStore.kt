@@ -20,8 +20,10 @@ import com.epam.inject.viewmodel.AssistedViewModel
 import com.epam.inject.viewmodel.processor.error
 import javax.annotation.processing.ProcessingEnvironment
 import javax.annotation.processing.RoundEnvironment
+import javax.inject.Scope
 import javax.lang.model.element.Element
 import javax.lang.model.element.TypeElement
+import javax.lang.model.type.TypeMirror
 
 /**
  * Analyzes if for the current round exist [ViewModel] implementations with constructor marked with
@@ -32,7 +34,7 @@ internal class AssistedViewModelStore(processingEnv: ProcessingEnvironment) {
     /**
      * Storage for ViewModels which should be processed by the processor.
      */
-    val foundViewModels = mutableSetOf<TypeElement>()
+    val viewModels = mutableMapOf<TypeMirror?, MutableList<TypeElement>>()
 
     private val messager = processingEnv.messager
     private val elementUtils = processingEnv.elementUtils
@@ -54,15 +56,39 @@ internal class AssistedViewModelStore(processingEnv: ProcessingEnvironment) {
             val annotatedConstructors = findConstructors(element as TypeElement)
 
             if (annotatedConstructors.isNotEmpty()) {
-                if (!validateAnnotatedElements(element, viewModelType, annotatedConstructors)) {
+                val annotationMirror = annotatedConstructors
+                    .first()
+                    .annotationMirrors
+                    .first()
+
+                val currentScope = if (annotationMirror.elementValues.isEmpty())
+                    null
+                else annotationMirror
+                    .elementValues
+                    .values
+                    .first()
+                    .value as TypeMirror
+
+                if (!validateAnnotatedElements(
+                        element,
+                        viewModelType,
+                        annotatedConstructors,
+                        currentScope
+                    )
+                ) {
                     clear()
                     return false
                 }
-                foundViewModels += element
+
+                if (!viewModels.containsKey(currentScope)) {
+                    viewModels[currentScope] = mutableListOf()
+                }
+
+                viewModels[currentScope]?.add(element)
             }
         }
 
-        return foundViewModels.isNotEmpty()
+        return viewModels.isNotEmpty()
     }
 
     /**
@@ -80,7 +106,8 @@ internal class AssistedViewModelStore(processingEnv: ProcessingEnvironment) {
      * Remove all ViewModels from [foundViewModels].
      */
     fun clear() {
-        foundViewModels.clear()
+        /*foundViewModels.clear()*/
+        viewModels.clear()
     }
 
     /**
@@ -93,12 +120,19 @@ internal class AssistedViewModelStore(processingEnv: ProcessingEnvironment) {
     private fun validateAnnotatedElements(
         elementType: TypeElement,
         expectedSuperType: TypeElement,
-        constructors: List<Element>
+        constructors: List<Element>,
+        scope: TypeMirror?
     ): Boolean = if (constructors.size > 1) {
         messager.error(
             "Class ${elementType.qualifiedName} has more then one constructor " +
                     "marked with ${com.epam.inject.viewmodel.AssistedViewModel::class.java.simpleName} " +
                     "annotation"
+        )
+        false
+    } else if (scope !== null && typeUtils.asElement(scope).getAnnotation(Scope::class.java) === null) {
+        messager.error(
+            "Element provided to the ${AssistedViewModel::class.java.simpleName} is not marked " +
+                    "as ${Scope::class.java.simpleName}"
         )
         false
     } else if (!typeUtils.isAssignable(elementType.asType(), expectedSuperType.asType())) {

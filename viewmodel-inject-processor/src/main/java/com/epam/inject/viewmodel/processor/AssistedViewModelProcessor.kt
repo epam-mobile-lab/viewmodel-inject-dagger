@@ -68,11 +68,14 @@ internal class AssistedViewModelProcessor : AbstractProcessor() {
         val isFound = store.process(re)
         if (isFound) {
             val factoryGenerator = FactoryGenerator()
-            val genClassFactory = factoryGenerator.generateFactoryClass()
-            val genFactoryModule = factoryGenerator.generateFactoryModule(genClassFactory)
+            val genClassFactories = factoryGenerator.generateFactoryClass(store.viewModels.keys)
+            val genFactoryModules = factoryGenerator.generateFactoryModule(genClassFactories)
             val genClassModule =
-                ModuleGenerator(processingEnv).generate(store.foundViewModels)
-            writeClasses(genClassFactory, genFactoryModule, genClassModule)
+                ModuleGenerator(processingEnv).generate(store.viewModels, genFactoryModules)
+            writeClasses(
+                genClassFactories.values,
+                genFactoryModules.values,
+                genClassModule.values)
         }
         return true
     }
@@ -81,9 +84,13 @@ internal class AssistedViewModelProcessor : AbstractProcessor() {
      * Writes generated classes to the java files. After the completion clears the store.
      * @param genClasses classes should be written to the files for this generation round.
      */
-    private fun writeClasses(vararg genClasses: TypeSpec) {
+    private fun writeClasses(genFactories: Collection<TypeSpec>,
+                             genFactoryModules: Collection<TypeSpec>,
+                             genModules: Collection<TypeSpec>) {
         val fileWriter = FileWriter(processingEnv)
-        genClasses.forEach { fileWriter.writeToFile(it) }
+        genFactories.forEach { fileWriter.writeToFile(it) }
+        genFactoryModules.forEach { fileWriter.writeToFile(it) }
+        genModules.forEach { fileWriter.writeToFile(it) }
         store.clear()
     }
 

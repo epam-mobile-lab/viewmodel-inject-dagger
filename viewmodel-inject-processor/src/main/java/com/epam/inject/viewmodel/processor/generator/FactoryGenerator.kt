@@ -20,6 +20,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.epam.inject.viewmodel.AssistedViewModelFactory
 import com.epam.inject.viewmodel.processor.AssistedViewModelProcessor.Companion.generateBaseComment
+import com.squareup.javapoet.AnnotationSpec
 import com.squareup.javapoet.ClassName
 import com.squareup.javapoet.FieldSpec
 import com.squareup.javapoet.MethodSpec
@@ -32,6 +33,8 @@ import dagger.Module
 import dagger.Provides
 import javax.inject.Provider
 import javax.lang.model.element.Modifier
+import javax.lang.model.element.TypeElement
+import javax.lang.model.type.TypeMirror
 
 /**
  * Generates implementation of [ViewModelProvider.Factory] which would contain created ViewModel.
@@ -44,42 +47,69 @@ internal class FactoryGenerator {
      * Generates factory to which would store ViewModels created by dagger.
      * @return [TypeSpec] of the factory which can be later written to the file.
      */
-    fun generateFactoryClass(): TypeSpec {
+    fun generateFactoryClass(scopes: Set<TypeMirror?>): Map<TypeMirror?, TypeSpec> {
         val typeParameterizedProvider = generateTypeParameterizedProvider()
         val mapType = generateMapType(generateWildCardClass(), typeParameterizedProvider)
         val classParam = generateClassParam(generateParameterType())
 
-        return TypeSpec.classBuilder(DEFAULT_FACTORY_NAME)
-            .addJavadoc(generateBaseComment())
-            .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
-            .superclass(AssistedViewModelFactory::class.java)
-            .addField(generateMapField(mapType))
-            .addMethod(generateConstructor(mapType))
-            .addMethod(generateCreateMethod(classParam, typeParameterizedProvider))
-            .build()
+        val resultFactories = mutableMapOf<TypeMirror?, TypeSpec>()
+
+        for (scope in scopes) {
+            val scopeName = if (scope === null) "" else scope.toString().substringAfterLast(".")
+            val factory = TypeSpec.classBuilder(scopeName + DEFAULT_FACTORY_NAME)
+                .addJavadoc(generateBaseComment())
+                .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
+                .superclass(AssistedViewModelFactory::class.java)
+                .addField(generateMapField(mapType))
+                .addMethod(generateConstructor(mapType))
+                .addMethod(generateCreateMethod(classParam, typeParameterizedProvider))
+                .build()
+
+            resultFactories[scope] = factory
+        }
+
+        return resultFactories
     }
 
     /**
      * Generate dagger module for provide [AssistedViewModelFactory]
      * Module will be named as [DEFAULT_FACTORY_MODULE_NAME] const
      */
-    fun generateFactoryModule(factoryType: TypeSpec): TypeSpec {
-        return TypeSpec.classBuilder("${DEFAULT_FACTORY_NAME}Module")
-            .addModifiers(Modifier.PUBLIC)
-            .addAnnotation(Module::class.java)
-            .addMethod(generateProvideMethod(factoryType))
-            .build()
+
+    fun generateFactoryModule(factoryTypes: Map<TypeMirror?, TypeSpec>): Map<TypeMirror?, TypeSpec> {
+        val generatedFactoryModules = mutableMapOf<TypeMirror?, TypeSpec>()
+
+        for (factoryType in factoryTypes) {
+            val module = TypeSpec.classBuilder("${factoryType.value.name}Module")
+                .addModifiers(Modifier.PUBLIC)
+                .addAnnotation(Module::class.java)
+                .addMethod(generateProvideMethod(factoryType.key, factoryType.value))
+                .build()
+
+            generatedFactoryModules[factoryType.key] = module
+        }
+
+        return generatedFactoryModules
     }
 
     /**
      * Generate provide method for dagger module [AssistedViewModelFactory]
      */
-
-    private fun generateProvideMethod(factoryType: TypeSpec): MethodSpec {
+    private fun generateProvideMethod(scope: TypeMirror?, factoryType: TypeSpec): MethodSpec {
         val mapType = generateMapType(generateWildCardClass(), generateTypeParameterizedProvider())
 
         return MethodSpec.methodBuilder("provide_${factoryType.name}")
             .addAnnotation(Provides::class.java)
+            .apply {
+                if (scope != null) {
+                    addAnnotation(
+                        ClassName.get(
+                            scope.toString().substringBeforeLast("."),
+                            scope.toString().substringAfterLast(".")
+                        )
+                    )
+                }
+            }
             .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
             .addParameter(mapType, VIEWMODEL_FIELD_NAME)
             .returns(AssistedViewModelFactory::class.java)
@@ -189,7 +219,10 @@ internal class FactoryGenerator {
      * @return [ParameterizedTypeName] which defines the parameter type.
      */
     private fun generateParameterType(): ParameterizedTypeName {
-        return ParameterizedTypeName.get(ClassName.get(Class::class.java), TypeVariableName.get("T"))
+        return ParameterizedTypeName.get(
+            ClassName.get(Class::class.java),
+            TypeVariableName.get("T")
+        )
     }
 
     /**
@@ -231,7 +264,10 @@ internal class FactoryGenerator {
      * @param typeParameterizedProvider type of the
      * @return [MethodSpec] to provide ViewModel to the user
      */
-    private fun generateCreateMethod(classParam: ParameterSpec, typeParameterizedProvider: Any): MethodSpec {
+    private fun generateCreateMethod(
+        classParam: ParameterSpec,
+        typeParameterizedProvider: Any
+    ): MethodSpec {
         return MethodSpec.methodBuilder("create")
             .addAnnotation(Override::class.java)
             .addModifiers(Modifier.PUBLIC)

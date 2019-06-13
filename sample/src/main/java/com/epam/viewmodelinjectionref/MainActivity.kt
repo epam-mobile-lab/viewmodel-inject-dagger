@@ -26,11 +26,13 @@ import javax.inject.Inject
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var viewModel: SampleViewModel
+    //private lateinit var viewModel: SampleViewModel
+    private lateinit var viewModel: SampleScopedViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        (this.applicationContext as MainApplication).applicationComponent.inject(this)
+        //(this.applicationContext as MainApplication).applicationComponent.inject(this)
+        (this.applicationContext as MainApplication).applicationScopedComponent.inject(this)
         setContentView(R.layout.sample_activity)
 
         findViewById<TextView>(R.id.repoName).text = viewModel.repository.name
@@ -39,6 +41,7 @@ class MainActivity : AppCompatActivity() {
 
     @Inject
     internal fun initViewModel(viewModelFactory: AssistedViewModelFactory) {
-        viewModel = ViewModelProviders.of(this, viewModelFactory).get(SampleViewModel::class.java)
+        //viewModel = ViewModelProviders.of(this, viewModelFactory).get(SampleViewModel::class.java)
+        viewModel = ViewModelProviders.of(this, viewModelFactory).get(SampleScopedViewModel::class.java)
     }
 }

@@ -14,19 +14,11 @@
  * limitations under the License.
  */
 
-package com.epam.inject.viewmodel;
+package com.epam.viewmodelinjectionref.dagger
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import javax.inject.Scope
 
-/**
- * Annotates descendants of the ViewModel which has parametrized constructor and
- * should be add the generated factory.
- */
-@Target(ElementType.CONSTRUCTOR)
-@Retention(RetentionPolicy.SOURCE)
-public @interface AssistedViewModel {
-    Class<?> scope() default Object.class;
+@Scope
+@Retention(AnnotationRetention.RUNTIME)
+annotation class CustomScope {
 }

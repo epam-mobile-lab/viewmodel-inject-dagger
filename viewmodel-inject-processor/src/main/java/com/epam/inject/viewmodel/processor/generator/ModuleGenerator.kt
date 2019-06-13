@@ -36,6 +36,7 @@ import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.element.ExecutableElement
 import javax.lang.model.element.Modifier
 import javax.lang.model.element.TypeElement
+import javax.lang.model.type.TypeMirror
 
 /**
  * Generates dagger [Module] with provide methods to ViewModels that you pass in the [generate] method.
@@ -55,17 +56,35 @@ internal class ModuleGenerator(pe: ProcessingEnvironment) {
      * @param viewModels set of ViewModels that should be provided.
      * @return [TypeSpec] that represent dagger module with provide methods to ViewModels.
      */
-    fun generate(viewModels: Set<TypeElement>): TypeSpec {
-        return TypeSpec.classBuilder(name)
-            .addJavadoc(generateBaseComment())
-            .addModifiers(Modifier.PUBLIC)
-            .addAnnotation(AnnotationSpec
-                .builder(Module::class.java)
-                .addMember("includes", "$DEFAULT_FACTORY_MODULE_NAME.class")
+    fun generate(
+        viewModels: Map<TypeMirror?, MutableList<TypeElement>>,
+        moduleTypes: Map<TypeMirror?, TypeSpec>
+    ): Map<TypeMirror?, TypeSpec> {
+        val resultModules = mutableMapOf<TypeMirror?, TypeSpec>()
+
+        for (viewModel in viewModels) {
+            val scopeName =
+                if (viewModel.key === null) "" else viewModel.key.toString().substringAfterLast(".")
+
+            val module = TypeSpec.classBuilder(scopeName + name)
+                .addJavadoc(generateBaseComment())
+                .addModifiers(Modifier.PUBLIC)
+                .addAnnotation(
+                    AnnotationSpec
+                        .builder(Module::class.java)
+                        .addMember("includes", "${moduleTypes[viewModel.key]?.name}.class")
+                        .build()
+                )
+                .addMethods(
+                    generateProvideMethods(viewModel.value, viewModel.key)
+                )
                 .build()
-            )
-            .addMethods(generateProvideMethods(viewModels))
-            .build()
+
+            resultModules[viewModel.key] = module
+        }
+
+
+        return resultModules
     }
 
     /**
@@ -73,9 +92,13 @@ internal class ModuleGenerator(pe: ProcessingEnvironment) {
      * @param viewModels the set of ViewModels for which should be created provide methods.
      * @return list of provide [MethodSpec].
      */
-    private fun generateProvideMethods(viewModels: Set<TypeElement>): List<MethodSpec> {
-        return viewModels.onEach { messager.note(" -> ${it.qualifiedName} added to the module") }
-            .map { generateProvideMethod(it) }
+    private fun generateProvideMethods(
+        viewModels: List<TypeElement>,
+        scope: TypeMirror?
+    ): List<MethodSpec> {
+        return viewModels
+            .onEach { messager.note(" -> ${it.qualifiedName} added to the module") }
+            .map { generateProvideMethod(it, scope) }
     }
 
     /**
@@ -83,13 +106,23 @@ internal class ModuleGenerator(pe: ProcessingEnvironment) {
      * @param vm the ViewModel type element.
      * @return [MethodSpec] that represents provide method.
      */
-    private fun generateProvideMethod(vm: TypeElement): MethodSpec {
+    private fun generateProvideMethod(vm: TypeElement, scope: TypeMirror?): MethodSpec {
         val dependencies = getDependencies(vm)
         val params = generateMethodParams(dependencies)
         val methodName = "provide_${vm.qualifiedName.toString().replace(".", "_")}"
 
         return MethodSpec.methodBuilder(methodName)
             .addAnnotation(Provides::class.java)
+            .apply {
+                if (scope != null) {
+                    addAnnotation(
+                        ClassName.get(
+                            scope.toString().substringBeforeLast("."),
+                            scope.toString().substringAfterLast(".")
+                        )
+                    )
+                }
+            }
             .addAnnotation(IntoMap::class.java)
             .addAnnotation(generateKeyAnnotation(vm))
             .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
@@ -127,7 +160,8 @@ internal class ModuleGenerator(pe: ProcessingEnvironment) {
         val viewModelDependencies = mutableMapOf<String, TypeName>()
         findConstructors(type).forEach { constructor ->
             constructor.parameters.forEach { parameter ->
-                viewModelDependencies[parameter.simpleName.toString()] = TypeName.get(parameter.asType())
+                viewModelDependencies[parameter.simpleName.toString()] =
+                    TypeName.get(parameter.asType())
             }
         }
         return viewModelDependencies
