@@ -16,6 +16,7 @@
 
 package com.epam.inject.viewmodel.processor
 
+import com.epam.inject.viewmodel.processor.source.SourceCode
 import com.google.testing.compile.CompilationSubject.assertThat
 import com.google.testing.compile.Compiler.javac
 import com.google.testing.compile.JavaFileObjects
@@ -33,21 +34,9 @@ class ViewModelStoreTest {
 
     @Test
     fun `validate source is not subclass of ViewModel`() {
-
         val notViewModel = JavaFileObjects.forSourceString(
-                "test.NotViewModelClass",
-                """
-                package test;
-            import com.epam.inject.viewmodel.AssistedViewModel;
-
-            public class NotViewModelClass {
-
-                @AssistedViewModel
-                public NotViewModelClass() {
-                }
-
-            }
-            """
+            "test.NotViewModelClass",
+            SourceCode.StoreTest.isNotSubclassOfViewModelSource
         )
 
         val compilation = javac().withProcessors(processor).compile(notViewModel)
@@ -58,29 +47,13 @@ class ViewModelStoreTest {
 
     @Test
     fun `validate source has several marked constructors`() {
-
         val viewModelWithSeveralConstructors = JavaFileObjects.forSourceString(
             "test.fail.ViewModelClass",
-            """
-                package test.fail;
-            import com.epam.inject.viewmodel.AssistedViewModel;
-            import androidx.lifecycle.ViewModel;
-
-            public class ViewModelClass extends ViewModel {
-
-                @AssistedViewModel
-                public ViewModelClass() {
-                }
-
-                @AssistedViewModel
-                public ViewModelClass(Object object) {
-                }
-
-            }
-            """
+            SourceCode.StoreTest.hasSeveralMarkedConstructorsSource
         )
 
-        val compilation = javac().withProcessors(processor).compile(viewModelWithSeveralConstructors)
+        val compilation =
+            javac().withProcessors(processor).compile(viewModelWithSeveralConstructors)
 
         assertThat(compilation).failed()
         assertThat(compilation).hadErrorContaining("has more then one constructor marked with AssistedViewModel annotation")
@@ -90,27 +63,14 @@ class ViewModelStoreTest {
     fun `validate source is subclass of ViewModel`() {
 
         val viewModelClass = JavaFileObjects
-                .forSourceString(
-                        "test.ViewModelClass",
-                        """
-                package test;
-
-            import com.epam.inject.viewmodel.AssistedViewModel;
-            import androidx.lifecycle.ViewModel;
-
-            public class ViewModelClass extends ViewModel {
-
-                @AssistedViewModel
-                public ViewModelClass(){
-                }
-
-            }
-            """
-                )
+            .forSourceString(
+                "test.ViewModelClass",
+                SourceCode.StoreTest.subclassOfViewModelSource
+            )
 
         val compilation = javac().withProcessors(processor).compile(viewModelClass)
 
         assertThat(compilation)
-                .succeeded()
+            .succeeded()
     }
 }

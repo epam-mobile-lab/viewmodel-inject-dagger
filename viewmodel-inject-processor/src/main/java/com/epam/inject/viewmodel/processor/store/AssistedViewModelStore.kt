@@ -16,11 +16,13 @@
 
 package com.epam.inject.viewmodel.processor.store
 
+import androidx.lifecycle.ViewModel
 import com.epam.inject.viewmodel.AssistedViewModel
 import com.epam.inject.viewmodel.processor.error
 import javax.annotation.processing.ProcessingEnvironment
 import javax.annotation.processing.RoundEnvironment
 import javax.inject.Scope
+import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
 import javax.lang.model.element.TypeElement
 import javax.lang.model.type.TypeMirror
@@ -49,25 +51,15 @@ internal class AssistedViewModelStore(processingEnv: ProcessingEnvironment) {
      */
     fun process(roundEnvironment: RoundEnvironment): Boolean {
         val viewModelType: TypeElement =
-            elementUtils.getTypeElement("androidx.lifecycle.ViewModel")
-                ?: error("androidx.lifecycle.ViewModel type was not found")
+            elementUtils.getTypeElement(ViewModel::class.java.canonicalName)
+                ?: error("${ViewModel::class.java.canonicalName} type was not found")
 
         roundEnvironment.rootElements.forEach { element ->
             val annotatedConstructors = findConstructors(element as TypeElement)
 
             if (annotatedConstructors.isNotEmpty()) {
-                val annotationMirror = annotatedConstructors
-                    .first()
-                    .annotationMirrors
-                    .first()
-
-                val currentScope = if (annotationMirror.elementValues.isEmpty())
-                    null
-                else annotationMirror
-                    .elementValues
-                    .values
-                    .first()
-                    .value as TypeMirror
+                val annotationMirror = getAssistedAnnotation(annotatedConstructors)
+                val currentScope = getScopeParameter(annotationMirror)
 
                 if (!validateAnnotatedElements(
                         element,
@@ -106,7 +98,6 @@ internal class AssistedViewModelStore(processingEnv: ProcessingEnvironment) {
      * Remove all ViewModels from [foundViewModels].
      */
     fun clear() {
-        /*foundViewModels.clear()*/
         viewModels.clear()
     }
 
@@ -141,4 +132,33 @@ internal class AssistedViewModelStore(processingEnv: ProcessingEnvironment) {
     } else {
         true
     }
+
+    /**
+     * Extract [AnnotationMirror] of the [AssistedViewModel] annotation from the [ViewModel] constructor.
+     * @param annotatedConstructors list of the constructors annotated with [AssistedViewModel] annotation.
+     * @return [AnnotationMirror] for the constructor.
+     */
+    private fun getAssistedAnnotation(annotatedConstructors: List<Element>) = annotatedConstructors
+        .first() // Only one constructor can be marked with AssistedViewModel
+        .annotationMirrors
+        .first {
+            it.annotationType.asElement() == elementUtils
+                .getTypeElement(AssistedViewModel::class.java.canonicalName)
+        }
+
+    /**
+     * Extract `scope` parameter for [AssistedViewModel] annotation.
+     * @param annotationMirror representation of [AssistedViewModel] annotation.
+     * @return null - in case class has no value for `scope` parameter.
+     *         [TypeMirror] - if the value was provided to `scope` parameter .
+     */
+    private fun getScopeParameter(annotationMirror: AnnotationMirror) =
+        if (annotationMirror.elementValues.isEmpty())
+            null
+        else annotationMirror
+            .elementValues
+            .values
+            .first() //Only one parameter available for annotation
+            .value as TypeMirror
+
 }
