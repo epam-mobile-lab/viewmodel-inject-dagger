@@ -29,12 +29,13 @@ import javax.lang.model.type.TypeMirror
 
 /**
  * Analyzes if for the current round exist [ViewModel] implementations with constructor marked with
- * [AssistedViewModel] annotation. Such [ViewModel]s stored in the [foundViewModels] collection to
- * be processed.
+ * [AssistedViewModel] annotation. Such [ViewModel]s stored in the [viewModels] collection alongside
+ * with it scopes.
  */
 internal class AssistedViewModelStore(processingEnv: ProcessingEnvironment) {
     /**
-     * Storage for ViewModels which should be processed by the processor.
+     * Storage for ViewModels which should be processed by the processor. Represented by the pairs
+     * of [ViewModel] implementations should be processed and the scope should applied for generated modules.
      */
     val viewModels = mutableMapOf<TypeMirror?, MutableList<TypeElement>>()
 
@@ -44,7 +45,7 @@ internal class AssistedViewModelStore(processingEnv: ProcessingEnvironment) {
 
     /**
      * Analyze files provided for this for this round of generation. Classes that satisfy all
-     * requirements stores in the ViewModels collection for further processing.
+     * requirements stores in the [viewModels] collection for further processing.
      * @param roundEnvironment container for the information about the current round of the generation.
      * @return true - if there are ViewModel implementations for processing
      *         false - otherwise.
@@ -106,7 +107,10 @@ internal class AssistedViewModelStore(processingEnv: ProcessingEnvironment) {
      * @param elementType type which contains constructors annotated with [AssistedViewModel].
      * @param expectedSuperType expected supertype.
      * @param constructors list of the constructors marked with [AssistedViewModel] for the current type.
-     * @return true - if elementType inherits from ViewModel and marked by [AssistedViewModel], false otherwise.
+     * @param scope scope provided for the current element.
+     * @return true - if elementType inherits from ViewModel, marked by [AssistedViewModel] and provided
+     *         scope derives from [Scope] interface.
+     *         false otherwise.
      */
     private fun validateAnnotatedElements(
         elementType: TypeElement,

@@ -20,7 +20,6 @@ import androidx.lifecycle.ViewModel
 import com.epam.inject.viewmodel.AssistedViewModel
 import com.epam.inject.viewmodel.ViewModelKey
 import com.epam.inject.viewmodel.processor.AssistedViewModelProcessor.Companion.generateBaseComment
-import com.epam.inject.viewmodel.processor.generator.FactoryGenerator.Companion.DEFAULT_FACTORY_MODULE_NAME
 import com.epam.inject.viewmodel.processor.generator.ModuleGenerator.Companion.name
 import com.epam.inject.viewmodel.processor.note
 import com.squareup.javapoet.AnnotationSpec
@@ -39,22 +38,23 @@ import javax.lang.model.element.TypeElement
 import javax.lang.model.type.TypeMirror
 
 /**
- * Generates dagger [Module] with provide methods to ViewModels that you pass in the [generate] method.
- * Generated class will be named as [name] const.
+ * Generates dagger [Module]s with provide methods to ViewModels that you pass in the [generate] method.
+ * Generated class will be named as combination of scope name and [name] const.
  */
-internal class ModuleGenerator(pe: ProcessingEnvironment) {
+internal class ModuleGenerator(processingEnvironment: ProcessingEnvironment) {
 
     private companion object {
         private const val name = "ViewModelInjectModule"
     }
 
-    private val messager = pe.messager
-    private val elementUtils = pe.elementUtils
+    private val messager = processingEnvironment.messager
+    private val elementUtils = processingEnvironment.elementUtils
 
     /**
      * Generates [TypeSpec] dagger module with set of ViewModels.
-     * @param viewModels set of ViewModels that should be provided.
-     * @return [TypeSpec] that represent dagger module with provide methods to ViewModels.
+     * @param viewModels set of ViewModels that should be provided for the defined scope.
+     * @param moduleTypes map of factories should be included in the generated module.
+     * @return map of [TypeSpec]s that represent dagger module with provide methods to ViewModels.
      */
     fun generate(
         viewModels: Map<TypeMirror?, MutableList<TypeElement>>,
