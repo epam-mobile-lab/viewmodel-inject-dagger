@@ -21,16 +21,25 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProviders
 import com.epam.inject.viewmodel.AssistedViewModelFactory
+import com.epam.viewmodelinjectionref.dagger.CustomScope
 
 import javax.inject.Inject
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var viewModel: SampleViewModel
+    /*
+    In case of using scoped component:
+    private lateinit var scopedViewModel: SampleScopedViewModel
+    */
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         (this.applicationContext as MainApplication).applicationComponent.inject(this)
+        /*
+        In case of using scoped component:
+        (this.applicationContext as MainApplication).applicationScopedComponent.inject(this)
+        */
         setContentView(R.layout.sample_activity)
 
         findViewById<TextView>(R.id.repoName).text = viewModel.repository.name
@@ -41,4 +50,11 @@ class MainActivity : AppCompatActivity() {
     internal fun initViewModel(viewModelFactory: AssistedViewModelFactory) {
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(SampleViewModel::class.java)
     }
+
+    /*
+    In case of using scoped component:
+    @Inject
+    internal fun initScopedViewModel(viewModelFactory: AssistedViewModelFactory) {
+        scopedViewModel = ViewModelProviders.of(this, viewModelFactory).get(SampleScopedViewModel::class.java)
+    }*/
 }

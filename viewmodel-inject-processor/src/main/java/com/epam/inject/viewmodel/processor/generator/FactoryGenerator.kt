@@ -20,6 +20,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.epam.inject.viewmodel.AssistedViewModelFactory
 import com.epam.inject.viewmodel.processor.AssistedViewModelProcessor.Companion.generateBaseComment
+import com.squareup.javapoet.AnnotationSpec
 import com.squareup.javapoet.ClassName
 import com.squareup.javapoet.FieldSpec
 import com.squareup.javapoet.MethodSpec
@@ -32,6 +33,8 @@ import dagger.Module
 import dagger.Provides
 import javax.inject.Provider
 import javax.lang.model.element.Modifier
+import javax.lang.model.element.TypeElement
+import javax.lang.model.type.TypeMirror
 
 /**
  * Generates implementation of [ViewModelProvider.Factory] which would contain created ViewModel.
@@ -41,45 +44,98 @@ import javax.lang.model.element.Modifier
 internal class FactoryGenerator {
 
     /**
-     * Generates factory to which would store ViewModels created by dagger.
-     * @return [TypeSpec] of the factory which can be later written to the file.
+     * Generates factory to which ViewModels created by dagger would be stored. Name of the generated
+     * factory would be concatination of the scope's simple name and [DEFAULT_FACTORY_NAME].
+     * @param scopes all scopes provided for which factory should be generated.
+     * @return map of [TypeSpec] for the factories which would be later written to the file.
      */
-    fun generateFactoryClass(): TypeSpec {
+    fun generateFactoryClass(scopes: Set<TypeMirror?>): Map<TypeMirror?, TypeSpec> {
         val typeParameterizedProvider = generateTypeParameterizedProvider()
         val mapType = generateMapType(generateWildCardClass(), typeParameterizedProvider)
         val classParam = generateClassParam(generateParameterType())
 
-        return TypeSpec.classBuilder(DEFAULT_FACTORY_NAME)
-            .addJavadoc(generateBaseComment())
-            .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
-            .superclass(AssistedViewModelFactory::class.java)
-            .addField(generateMapField(mapType))
-            .addMethod(generateConstructor(mapType))
-            .addMethod(generateCreateMethod(classParam, typeParameterizedProvider))
-            .build()
+        val resultFactories = mutableMapOf<TypeMirror?, TypeSpec>()
+
+        for (scope in scopes) {
+            val scopeName = if (scope === null) "" else scope.toString().substringAfterLast(".")
+            val factory = TypeSpec.classBuilder(scopeName + DEFAULT_FACTORY_NAME)
+                .addJavadoc(generateBaseComment())
+                .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
+                .superclass(AssistedViewModelFactory::class.java)
+                .addField(generateMapField(mapType))
+                .addMethod(generateConstructor(mapType))
+                .addMethod(generateCreateMethod(classParam, typeParameterizedProvider))
+                .build()
+
+            resultFactories[scope] = factory
+        }
+
+        return resultFactories
     }
 
     /**
-     * Generate dagger module for provide [AssistedViewModelFactory]
-     * Module will be named as [DEFAULT_FACTORY_MODULE_NAME] const
+     * Generate dagger module to provide [AssistedViewModelFactory] Module will be named as
+     * combination of scope name and [DEFAULT_FACTORY_MODULE_NAME].
+     *
+     * @Module
+     * public class GeneratedViewModelFactoryModule {
+     *   @Provides
+     *   public static AssistedViewModelFactory provide_GeneratedViewModelFactory(
+     *      Map<Class<? extends ViewModel>, Provider<ViewModel>> viewModelMap) {
+     *          return new GeneratedViewModelFactory(viewModelMap);
+     *      }
+     * }
+     *
+     * @param  factoryTypes pairs of generated factories and corresponding scopes.
+     * @return map of generated modules alongside with it's scopes.
      */
-    fun generateFactoryModule(factoryType: TypeSpec): TypeSpec {
-        return TypeSpec.classBuilder("${DEFAULT_FACTORY_NAME}Module")
-            .addModifiers(Modifier.PUBLIC)
-            .addAnnotation(Module::class.java)
-            .addMethod(generateProvideMethod(factoryType))
-            .build()
+
+    fun generateFactoryModule(factoryTypes: Map<TypeMirror?, TypeSpec>): Map<TypeMirror?, TypeSpec> {
+        val generatedFactoryModules = mutableMapOf<TypeMirror?, TypeSpec>()
+
+        for (factoryType in factoryTypes) {
+            val module = TypeSpec.classBuilder("${factoryType.value.name}Module")
+                .addModifiers(Modifier.PUBLIC)
+                .addAnnotation(Module::class.java)
+                .addMethod(generateProvideMethod(factoryType.key, factoryType.value))
+                .build()
+
+            generatedFactoryModules[factoryType.key] = module
+        }
+
+        return generatedFactoryModules
     }
 
     /**
-     * Generate provide method for dagger module [AssistedViewModelFactory]
+     * Generate provide method for dagger module [AssistedViewModelFactory].
+     *
+     * ```
+     *  @Provides
+     *  public static AssistedViewModelFactory provide_GeneratedViewModelFactory(
+     *   Map<Class<? extends ViewModel>, Provider<ViewModel>> viewModelMap) {
+     *       return new GeneratedViewModelFactory(viewModelMap);
+     *   }
+     * ```
+     *
+     * @param scope scope should be used for provide method.
+     * @param factoryType factory type of generated factory.
+     * @return [MethodSpec] which defines provide method.
      */
-
-    private fun generateProvideMethod(factoryType: TypeSpec): MethodSpec {
+    private fun generateProvideMethod(scope: TypeMirror?, factoryType: TypeSpec): MethodSpec {
         val mapType = generateMapType(generateWildCardClass(), generateTypeParameterizedProvider())
 
         return MethodSpec.methodBuilder("provide_${factoryType.name}")
             .addAnnotation(Provides::class.java)
+            .apply {
+                if (scope != null) {
+                    addAnnotation(
+                        ClassName.get(
+                            scope.toString().substringBeforeLast("."),
+                            scope.toString().substringAfterLast(".")
+                        )
+                    )
+                }
+            }
             .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
             .addParameter(mapType, VIEWMODEL_FIELD_NAME)
             .returns(AssistedViewModelFactory::class.java)
@@ -189,7 +245,10 @@ internal class FactoryGenerator {
      * @return [ParameterizedTypeName] which defines the parameter type.
      */
     private fun generateParameterType(): ParameterizedTypeName {
-        return ParameterizedTypeName.get(ClassName.get(Class::class.java), TypeVariableName.get("T"))
+        return ParameterizedTypeName.get(
+            ClassName.get(Class::class.java),
+            TypeVariableName.get("T")
+        )
     }
 
     /**
@@ -231,7 +290,10 @@ internal class FactoryGenerator {
      * @param typeParameterizedProvider type of the
      * @return [MethodSpec] to provide ViewModel to the user
      */
-    private fun generateCreateMethod(classParam: ParameterSpec, typeParameterizedProvider: Any): MethodSpec {
+    private fun generateCreateMethod(
+        classParam: ParameterSpec,
+        typeParameterizedProvider: Any
+    ): MethodSpec {
         return MethodSpec.methodBuilder("create")
             .addAnnotation(Override::class.java)
             .addModifiers(Modifier.PUBLIC)
@@ -247,7 +309,9 @@ internal class FactoryGenerator {
             )
             .beginControlFlow("if(%s == null)".format("vmProvider"))
             .addStatement(
-                "throw new \$T(modelClass.getSimpleName() + \"%s\")".format(" isn't supported by the AssistedViewModelFactory."),
+                "throw new \$T(modelClass.getSimpleName() + \"%s\")".format(
+                    " isn't supported by the AssistedViewModelFactory."
+                ),
                 IllegalArgumentException::class.java
             )
             .endControlFlow()
@@ -264,7 +328,9 @@ internal class FactoryGenerator {
             .addStatement("return (\$T) %s".format("viewModel"), TypeVariableName.get("T"))
             .nextControlFlow("else")
             .addStatement(
-                "throw new \$T(modelClass.getSimpleName() + \"%s\")".format(" expected to be subtype of ${ViewModel::class.java.simpleName} class."),
+                "throw new \$T(modelClass.getSimpleName() + \"%s\")".format(
+                    " expected to be subtype of ${ViewModel::class.java.simpleName} class."
+                ),
                 IllegalArgumentException::class.java
             )
             .endControlFlow()

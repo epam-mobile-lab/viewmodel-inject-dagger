@@ -16,17 +16,11 @@
 
 package com.epam.viewmodelinjectionref
 
-import android.app.Application
-import com.epam.viewmodelinjectionref.dagger.ApplicationComponent
-import com.epam.viewmodelinjectionref.dagger.ApplicationScopedComponent
-import com.epam.viewmodelinjectionref.dagger.DaggerApplicationComponent
-import com.epam.viewmodelinjectionref.dagger.DaggerApplicationScopedComponent
+import androidx.lifecycle.ViewModel
+import com.epam.inject.viewmodel.AssistedViewModel
+import com.epam.viewmodelinjectionref.dagger.CustomScope
+import com.epam.viewmodelinjectionref.data.Repository
 
-
-class MainApplication : Application() {
-
-    val applicationComponent: ApplicationComponent = DaggerApplicationComponent.create()
-
-    val applicationScopedComponent: ApplicationScopedComponent =
-        DaggerApplicationScopedComponent.create()
-}
+class SampleScopedViewModel
+    @AssistedViewModel(scope = CustomScope::class) constructor(val repository: Repository) :
+    ViewModel() 

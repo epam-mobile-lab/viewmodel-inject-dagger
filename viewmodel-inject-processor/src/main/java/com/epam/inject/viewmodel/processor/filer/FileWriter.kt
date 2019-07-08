@@ -27,10 +27,10 @@ import javax.annotation.processing.ProcessingEnvironment
  * Writes generated classes to the destination files.
  * Files created with [JavaFile.builder] and wrote with [ProcessingEnvironment.getFiler].
  */
-internal class FileWriter(pe: ProcessingEnvironment) {
+internal class FileWriter(processingEnvironment: ProcessingEnvironment) {
 
-    private val messager = pe.messager
-    private val filer = pe.filer
+    private val messager = processingEnvironment.messager
+    private val filer = processingEnvironment.filer
 
     /**
      * Creates source file from [TypeSpec] using [JavaFile.builder], also using Filer(from [ProcessingEnvironment]).

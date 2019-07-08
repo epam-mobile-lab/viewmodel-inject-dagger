@@ -19,7 +19,12 @@ dependencies {
 ```kotlin
 class SampleViewModel @AssistedViewModel constructor(repository: Repository): ViewModel
 ```
+* (*) In case you want the generated module corresponds to some scope you can provide it with the
+`scope` parameter of `AssistedViewModel` annotation
 
+```kotlin
+class SampleViewModel @AssistedViewModel(scope = CustomScope.class) constructor(repository: Repository): ViewModel
+```
 * Perform the build to generate corresponding dagger module and ViewModel factory.
 * Add generated module to the root (app) module:
 
